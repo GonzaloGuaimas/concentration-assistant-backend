@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { File } from 'buffer';
 import { InferenceSession, Tensor } from 'onnxruntime-node';
 import { detectImage } from 'src/utils/model-detect';
 import { downloadBuffer } from 'src/utils/model-download';
 import { resultTransform } from 'src/utils/model-results';
-import { File } from 'buffer';
 const CUSTOM_MODEL_PATH =
-  '/Users/gonzaloguaimas/Documents/tesis/2024/concentration-assistant-backend/src/utils/custom_model.onnx';
+  '/Users/gonzaloguaimas/Documents/tesis/2024/concentration-assistant-backend/src/utils/5-model.onnx';
 const NMS_MODEL_PATH =
   '/Users/gonzaloguaimas/Documents/tesis/2024/concentration-assistant-backend/src/utils/nms-yolov8.onnx';
 const MODEL_SHAPES = [1, 3, 640, 640];
@@ -40,13 +40,13 @@ export class DetectionService {
     if (!this.session) {
       throw new Error('Session not initialized');
     }
-
     const result = await detectImage(image, this.session);
     const resultTransformed = resultTransform(result);
     console.log(
-      `label: ${resultTransformed[0].label} | ${resultTransformed[0].confidence}`,
+      `label: ${resultTransformed[0]?.label} | ${resultTransformed[0]?.confidence}`,
     );
 
-    return result;
+    if (result.length > 0) return result;
+    return [{ label: 4, confidence: 0.01 }];
   }
 }
