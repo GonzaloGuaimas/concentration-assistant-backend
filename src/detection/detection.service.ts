@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { File } from 'buffer';
 import { InferenceSession, Tensor } from 'onnxruntime-node';
+import * as path from 'path';
 import { detectImage } from 'src/utils/model-detect';
 import { downloadBuffer } from 'src/utils/model-download';
 import { resultTransform } from 'src/utils/model-results';
-const CUSTOM_MODEL_PATH =
-  '/Users/gonzaloguaimas/Documents/tesis/2024/concentration-assistant-backend/src/utils/5-model.onnx';
-const NMS_MODEL_PATH =
-  '/Users/gonzaloguaimas/Documents/tesis/2024/concentration-assistant-backend/src/utils/nms-yolov8.onnx';
+
+const CUSTOM_MODEL_PATH = path.resolve(
+  __dirname,
+  '../../src/utils/5-model.onnx',
+);
+const NMS_MODEL_PATH = path.resolve(
+  __dirname,
+  '../../src/utils/nms-yolov8.onnx',
+);
 const MODEL_SHAPES = [1, 3, 640, 640];
 
 @Injectable()
@@ -19,6 +25,7 @@ export class DetectionService {
       console.error('Failed to initialize session:', error);
     });
   }
+
   private async initializeSession(): Promise<void> {
     const arrBufNet = await downloadBuffer(CUSTOM_MODEL_PATH);
     const yolov8 = await InferenceSession.create(arrBufNet);
